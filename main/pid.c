@@ -21,7 +21,8 @@ int speed(float angle, float speed){
     return Kp_s * Speed_Difference + Ki_s * Integral_Speed_Diff; // PI
 }
 
-// Keep the cat at a target direction (yaw)
+// Keep the car at a target direction (yaw)
 int direction(float angular_velocity){
-    return Kd_d * angular_velocity; // D
+    if (Target_Direction == 0) return Kd_d * angular_velocity; // D
+    else return Kp_d * Target_Direction; // P
 }
