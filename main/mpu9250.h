@@ -1,10 +1,10 @@
 #ifndef __MPU9250_H__
 #define __MPU9250_H__
 
-float pitch_angle;
-float pitch_angular_v;
-float speed_x;
-float yaw_angular_v;
+extern float pitch_angle;
+extern float pitch_angular_v;
+extern float speed_x;
+extern float yaw_angular_v;
 
 
 void MPU9250_init();

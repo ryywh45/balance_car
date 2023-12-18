@@ -4,6 +4,11 @@
 
 MPU9250 mpu;
 
+float pitch_angle;
+float pitch_angular_v;
+float speed_x;
+float yaw_angular_v;
+
 void MPU9250_init() {
     Serial.begin(115200);
     Wire.begin();
@@ -28,7 +33,6 @@ void MPU9250_init() {
     delay(5000);
     mpu.calibrateMag();
 
-    print_calibration();
     mpu.verbose(false);
 }
 
@@ -40,13 +44,13 @@ void MPU9250_updata() {
 }
 
 void MPU9250_test(){
-  Serial.println("ax, gy, pitch, gz")
+  Serial.println("ax, gy, pitch, gz");
   Serial.print(mpu.getAccX());
   Serial.print(", ");
   Serial.print(mpu.getGyroY());
   Serial.print(", ");
   Serial.print(mpu.getPitch());
   Serial.print(", ");
-  Serial.printmpu.getGyroZ());
+  Serial.print(mpu.getGyroZ());
   Serial.println(", ");
 }
