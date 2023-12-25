@@ -44,13 +44,27 @@ void MPU9250_updata() {
 }
 
 void MPU9250_test(){
-  Serial.println("ax, gy, pitch, gz");
+  Serial.print("Accelerometer: ");
   Serial.print(mpu.getAccX());
+  Serial.print(", ");
+  Serial.print(mpu.getAccY());
+  Serial.print(", ");
+  Serial.print(mpu.getAccZ());
+  Serial.println("");
+
+  Serial.print("Gyro: ");
+  Serial.print(mpu.getGyroX());
   Serial.print(", ");
   Serial.print(mpu.getGyroY());
   Serial.print(", ");
+  Serial.print(mpu.getGyroZ());
+  Serial.println("");
+  
+  Serial.print("Compass: ");
+  Serial.print(mpu.getRow());
+  Serial.print(", ");
   Serial.print(mpu.getPitch());
   Serial.print(", ");
-  Serial.print(mpu.getGyroZ());
-  Serial.println(", ");
+  Serial.print(mpu.getYaw());
+  Serial.println("");
 }
