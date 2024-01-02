@@ -10,5 +10,6 @@ extern float yaw_angular_v;
 void MPU9250_init();
 void MPU9250_update();
 void MPU9250_test();
+void calibrateIMU();
 
 #endif // __MPU9250_H__

@@ -13,7 +13,7 @@ void Motor_ctrl();
 void Apply_PWM(int pwm, int motor_num);
 #define PWM_L 32
 #define LIN1 25
-#define LIN2 23
+#define LIN2 23 //33
 #define PWM_R 12
 #define RIN1 27
 #define RIN2 14
