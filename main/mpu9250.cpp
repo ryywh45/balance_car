@@ -5,6 +5,7 @@
 bfs::Mpu9250 mpu;
 Adafruit_Madgwick filter;
 
+//unit of acc [m/s2], gyro [deg/s], angle [deg]
 float pitch_angle;
 float pitch_angular_v;
 float speed_x;
@@ -12,7 +13,7 @@ float yaw_angular_v;
 float aX,aY,aZ,gX,gY,gZ;
 float accErrorX = 0.19641, accErrorY = 0.42531, accErrorZ = -0.16247;
 float gyroErrorX = -0.04489, gyroErrorY = -0.07271, gyroErrorZ = 0.01201;
-float sampleRate = 10;
+float sampleRate = 17.45;       //sampleRate = 1/((1/1000+中斷時間)(57.3))
 
 //initial
 void MPU9250_init() {
@@ -30,7 +31,7 @@ void MPU9250_init() {
     while(1) {}
   }
   /* Set the sample rate divider */
-  if (!myIMU.ConfigSrd(0)) {
+  if (!myIMU.ConfigSrd(0)) {                   //imu freguency = 1000/(function_input+1) function_input = 0
     Serial.println("Error configured SRD");
     while(1) {}
   }
@@ -41,17 +42,17 @@ void MPU9250_init() {
 //update speed_x, pitch_angular_v, pitch_angle, yaw_angular_v
 void MPU9250_updata() {
   myIMU.Read()
-  aX = myIMU.accel_x_mps2() - accErrorX;
-  aY = myIMU.accel_y_mps2() - accErrorY;
-  aZ = myIMU.accel_z_mps2() - accErrorZ;
+  aX = (myIMU.accel_x_mps2() - accErrorX)/10;
+  aY = (myIMU.accel_y_mps2() - accErrorY)/10;
+  aZ = (myIMU.accel_z_mps2() - accErrorZ)/10;
   gX = myIMU.gyro_x_radps() - gyroErrorX;
   gY = myIMU.gyro_y_radps() - gyroErrorY;
   gZ = myIMU.gyro_z_radps() - gyroErrorZ;
   filter.updateIMU(gX, gY, gZ, aX, aY, aZ);
   speed_x = -aX;            //向前是正
-  pitch_angular_v = gY;     //向前傾斜是正
+  pitch_angular_v = gY*57.3;     //向前傾斜角度是正
   pitch_angle = fliter.getPitch();   
-  yaw_angular_v = -gZ;      //向右轉是正
+  yaw_angular_v = -gZ*57.3;      //向右轉是正
 }
 
 //print acc,gyro,pitch
@@ -63,11 +64,11 @@ void MPU9250_test(){
   Serial.print("\t");
   Serial.print(mpu.accel_z_mps2());
   Serial.print("\t");
-  Serial.print(mpu.gyro_x_radps());
+  Serial.print(mpu.gyro_x_radps()*57.3);
   Serial.print("\t");
-  Serial.print(mpu.gyro_y_radps());
+  Serial.print(mpu.gyro_y_radps()*57.3);
   Serial.print("\t");
-  Serial.print(mpu.gyro_z_radps());
+  Serial.print(mpu.gyro_z_radps()*57.3);
   Serial.print("\t");
   Serial.print(fliter.getPitch());
   Serial.println("");
