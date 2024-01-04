@@ -13,7 +13,7 @@ float yaw_angular_v;
 float aX,aY,aZ,gX,gY,gZ;
 float accErrorX = 0.19641, accErrorY = 0.42531, accErrorZ = -0.16247;
 float gyroErrorX = -0.04489, gyroErrorY = -0.07271, gyroErrorZ = 0.01201;
-float sampleRate = 17.45;       //sampleRate = 1/((1/1000+中斷時間)(57.3))
+float sampleRate = 17.45;       //sampleRate = 1/((1/1000+中斷時間)(57.2958))
 
 //initial
 void MPU9250_init() {
@@ -50,9 +50,9 @@ void MPU9250_updata() {
   gZ = myIMU.gyro_z_radps() - gyroErrorZ;
   filter.updateIMU(gX, gY, gZ, aX, aY, aZ);
   speed_x = -aX;            //向前是正
-  pitch_angular_v = gY*57.3;     //向前傾斜角度是正
+  pitch_angular_v = gY*57.2958;     //向前傾斜角度是正
   pitch_angle = fliter.getPitch();   
-  yaw_angular_v = -gZ*57.3;      //向右轉是正
+  yaw_angular_v = -gZ*57.2958;      //向右轉是正
 }
 
 //print acc,gyro,pitch
@@ -64,11 +64,11 @@ void MPU9250_test(){
   Serial.print("\t");
   Serial.print(mpu.accel_z_mps2());
   Serial.print("\t");
-  Serial.print(mpu.gyro_x_radps()*57.3);
+  Serial.print(mpu.gyro_x_radps()*57.2958);
   Serial.print("\t");
-  Serial.print(mpu.gyro_y_radps()*57.3);
+  Serial.print(mpu.gyro_y_radps()*57.2958);
   Serial.print("\t");
-  Serial.print(mpu.gyro_z_radps()*57.3);
+  Serial.print(mpu.gyro_z_radps()*57.2958);
   Serial.print("\t");
   Serial.print(fliter.getPitch());
   Serial.println("");
