@@ -5,17 +5,17 @@
 bfs::Mpu9250 mpu;
 Adafruit_Madgwick filter;
 
-//unit of acc [m/s2], gyro [deg/s], angle [deg]
+// unit of acc [m/s2], gyro [deg/s], angle [deg]
 float pitch_angle;
 float pitch_angular_v;
 float speed_x;
 float yaw_angular_v;
-float aX,aY,aZ,gX,gY,gZ;
+float aX, aY, aZ, gX, gY, gZ;
 float accErrorX = 0.19641, accErrorY = 0.42531, accErrorZ = -0.16247;
 float gyroErrorX = -0.04489, gyroErrorY = -0.07271, gyroErrorZ = 0.01201;
-float sampleRate = 17.45;       //sampleRate = 1/((1/1000+中斷時間)(57.2958))
+float sampleRate = 17.45;       // sampleRate = 1/((1/1000+中斷時間)(57.2958))
 
-//initial
+// initial
 void MPU9250_init() {
   /* Serial to display data */
   Serial.begin(115200);
@@ -39,23 +39,23 @@ void MPU9250_init() {
   filter.begin(sampleRate);
 }
 
-//update speed_x, pitch_angular_v, pitch_angle, yaw_angular_v
+// update speed_x, pitch_angular_v, pitch_angle, yaw_angular_v
 void MPU9250_updata() {
   myIMU.Read()
-  aX = (myIMU.accel_x_mps2() - accErrorX)/10;
-  aY = (myIMU.accel_y_mps2() - accErrorY)/10;
-  aZ = (myIMU.accel_z_mps2() - accErrorZ)/10;
+  aX = (myIMU.accel_x_mps2() - accErrorX) / 10;
+  aY = (myIMU.accel_y_mps2() - accErrorY) / 10;
+  aZ = (myIMU.accel_z_mps2() - accErrorZ) / 10;
   gX = myIMU.gyro_x_radps() - gyroErrorX;
   gY = myIMU.gyro_y_radps() - gyroErrorY;
   gZ = myIMU.gyro_z_radps() - gyroErrorZ;
   filter.updateIMU(gX, gY, gZ, aX, aY, aZ);
   speed_x = -aX;            //向前是正
-  pitch_angular_v = gY*57.2958;     //向前傾斜角度是正
+  pitch_angular_v = gY * RtoD;     //向前傾斜角度是正
   pitch_angle = fliter.getPitch();   
-  yaw_angular_v = -gZ*57.2958;      //向右轉是正
+  yaw_angular_v = -gZ * RtoD;      //向右轉是正
 }
 
-//print acc,gyro,pitch
+// print acc,gyro,pitch
 void MPU9250_test(){
   Serial.println("ax,ay,az,gx,gy,gz,pitch");
   Serial.print(mpu.accel_x_mps2());
@@ -64,17 +64,17 @@ void MPU9250_test(){
   Serial.print("\t");
   Serial.print(mpu.accel_z_mps2());
   Serial.print("\t");
-  Serial.print(mpu.gyro_x_radps()*57.2958);
+  Serial.print(mpu.gyro_x_radps()*RtoD);
   Serial.print("\t");
-  Serial.print(mpu.gyro_y_radps()*57.2958);
+  Serial.print(mpu.gyro_y_radps()*RtoD);
   Serial.print("\t");
-  Serial.print(mpu.gyro_z_radps()*57.2958);
+  Serial.print(mpu.gyro_z_radps()*RtoD);
   Serial.print("\t");
   Serial.print(fliter.getPitch());
   Serial.println("");
 }
 
-//update Bias(XXXError)
+// update Bias(XXXError)
 void calibrateIMU() {
 
   Serial.println("Start Calibrate.Please don't move imu");
@@ -89,7 +89,7 @@ void calibrateIMU() {
     float gyroErY = 0;
     float gyroErZ = 0;
 
-    //get mean value
+    // get mean value
     while (times < 300) {
       myIMU.Read();
       accErX += (mpu.accel_x_mps2() - accErrorX);
@@ -109,7 +109,7 @@ void calibrateIMU() {
     gyroErY = gyroErY / 300;
     gyroErZ = gyroErZ / 300;
 
-    //judge mean value error
+    // judge mean value error
     judge = (abs(accErX) > 0.01 || abs(accErY) > 0.01 || abs(accErZ + 10) > 0.01 || abs(gyroErX) > 0.001 || abs(gyroErY) > 0.001 || abs(gyroErZ) > 0.001);
 
     Serial.println(accErX, 3);
