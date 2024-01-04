@@ -24,14 +24,14 @@ void MPU9250_init() {
   Wire.begin();
   Wire.setClock(400000);
   /* I2C bus,  0x68 address */
-  myIMU.Config(&Wire, bfs::Mpu9250::I2C_ADDR_PRIM);
+  mpu.Config(&Wire, bfs::Mpu9250::I2C_ADDR_PRIM);
   /* Initialize and configure IMU */
-  if (!myIMU.Begin()) {
+  if (!mpu.Begin()) {
     Serial.println("Error initializing communication with IMU");
     while(1) {}
   }
   /* Set the sample rate divider */
-  if (!myIMU.ConfigSrd(0)) {                   //imu freguency = 1000/(function_input+1) function_input = 0
+  if (!mpu.ConfigSrd(0)) {                   //imu freguency = 1000/(function_input+1) function_input = 0
     Serial.println("Error configured SRD");
     while(1) {}
   }
@@ -41,13 +41,13 @@ void MPU9250_init() {
 
 //update speed_x, pitch_angular_v, pitch_angle, yaw_angular_v
 void MPU9250_updata() {
-  myIMU.Read()
-  aX = (myIMU.accel_x_mps2() - accErrorX)/10;
-  aY = (myIMU.accel_y_mps2() - accErrorY)/10;
-  aZ = (myIMU.accel_z_mps2() - accErrorZ)/10;
-  gX = myIMU.gyro_x_radps() - gyroErrorX;
-  gY = myIMU.gyro_y_radps() - gyroErrorY;
-  gZ = myIMU.gyro_z_radps() - gyroErrorZ;
+  mpu.Read()
+  aX = (mpu.accel_x_mps2() - accErrorX)/10;
+  aY = (mpu.accel_y_mps2() - accErrorY)/10;
+  aZ = (mpu.accel_z_mps2() - accErrorZ)/10;
+  gX = mpu.gyro_x_radps() - gyroErrorX;
+  gY = mpu.gyro_y_radps() - gyroErrorY;
+  gZ = mpu.gyro_z_radps() - gyroErrorZ;
   filter.updateIMU(gX, gY, gZ, aX, aY, aZ);
   speed_x = -aX;            //向前是正
   pitch_angular_v = gY*57.2958;     //向前傾斜角度是正
@@ -91,7 +91,7 @@ void calibrateIMU() {
 
     //get mean value
     while (times < 300) {
-      myIMU.Read();
+      mpu.Read();
       accErX += (mpu.accel_x_mps2() - accErrorX);
       accErY += (mpu.accel_y_mps2() - accErrorY);
       accErZ += (mpu.accel_z_mps2() - accErrorZ);
