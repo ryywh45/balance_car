@@ -33,9 +33,9 @@ void Timer_init() {
   // Attach onTimer function to our timer.
   timerAttachInterrupt(timer, &onTimer);
 
-  // Set alarm to call onTimer function every 1ms (value in microseconds).
+  // Set alarm to call onTimer function every Peroid(ms) (value in microseconds).
   // Repeat the alarm (third parameter) with unlimited count = 0 (fourth parameter).
-  timerAlarm(timer, 1000, true, 0);
+  timerAlarm(timer, Period * 1000, true, 0);
 }
 
 void check_timer() {

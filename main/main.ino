@@ -8,5 +8,5 @@ void setup(){
 void loop(){
     //Motor_ctrl();
     MPU9250_test();
-    delay(500);
+    delay(50);
 }
