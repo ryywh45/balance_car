@@ -23,12 +23,38 @@ void BT_init() {
   Serial.printf("The device with name \"%s\" is started.\nNow you can pair it with Bluetooth!\n", device_name.c_str());
 }
 
+// read and process data
 void BT_read() {
-  if (Serial.available()) {
-    SerialBT.write(Serial.read());
-  }
   if (SerialBT.available()) {
-    Serial.write(SerialBT.read());
+    char receivedChar = SerialBT.read();
+    Serial.println(receivedChar);
+    SerialBT.print(receivedChar);
+    SerialBT.print("\n");
+    dataProcess(receivedChar);
   }
+  else dataProcess('S');
   delay(20);
+}
+
+void dataProcess(char data){
+  switch (data){
+    case '1':
+      /* move forward */
+      Target_Speed = 10;
+      break;
+    case '2':
+      /* move backward */
+      Target_Speed = -10;
+    case '3':
+      /* turn left */
+      Target_Direction = -30;
+    case '4':
+      /* turn right */
+      Target_Direction =  30;  
+    default:
+      /* stop */
+      Target_Speed = 0;
+      Target_Direction = 0;
+      break;
+  }
 }

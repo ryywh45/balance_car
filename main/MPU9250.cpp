@@ -55,7 +55,7 @@ void MPU9250_updata() {
   gY = mpu.gyro_y_radps() - gyroErrorY;
   gZ = mpu.gyro_z_radps() - gyroErrorZ;
   filter.updateIMU(gX, gY, gZ, aX, aY, aZ);
-  speed_x = -(aX*elaspTime);            //向前是正
+  speed_x = -(aX*elaspTime*10);            //向前是正
   pitch_angular_v = gY * RtoD;     //向前傾斜角度是正
   pitch_angle = filter.getPitch();   
   yaw_angular_v = -gZ * RtoD;      //向右轉是正
