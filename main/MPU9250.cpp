@@ -14,6 +14,7 @@ float yaw_angular_v;
 float aX, aY, aZ, gX, gY, gZ;
 float accErrorX = 0.19641, accErrorY = 0.42531, accErrorZ = -0.16247;
 float gyroErrorX = -0.04489, gyroErrorY = -0.07271, gyroErrorZ = 0.01201;
+float previousTime = 0, currentTime = 0, elaspTime = 0;
 float sampleRate = 17.45;       // sampleRate = 1/((1/1000+中斷時間)(57.2958))
 
 // initial
@@ -38,11 +39,15 @@ void MPU9250_init() {
   }
   //calibrateIMU();
   filter.begin(sampleRate);
+  previousTime = millis();
 }
 
 // update speed_x, pitch_angular_v, pitch_angle, yaw_angular_v
 void MPU9250_updata() {
-  mpu.Read()
+  currentTime = millis();
+  mpu.Read();
+  elaspTime = (currentTime - previousTime)/1000;
+  previousTime = currentTime;
   aX = (mpu.accel_x_mps2() - accErrorX) / 10;
   aY = (mpu.accel_y_mps2() - accErrorY) / 10;
   aZ = (mpu.accel_z_mps2() - accErrorZ) / 10;
@@ -50,7 +55,7 @@ void MPU9250_updata() {
   gY = mpu.gyro_y_radps() - gyroErrorY;
   gZ = mpu.gyro_z_radps() - gyroErrorZ;
   filter.updateIMU(gX, gY, gZ, aX, aY, aZ);
-  speed_x = -aX;            //向前是正
+  speed_x = -(aX*elaspTime);            //向前是正
   pitch_angular_v = gY * RtoD;     //向前傾斜角度是正
   pitch_angle = filter.getPitch();   
   yaw_angular_v = -gZ * RtoD;      //向右轉是正
