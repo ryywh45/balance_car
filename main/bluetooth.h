@@ -6,7 +6,6 @@ extern float Target_Direction;
 
 void BT_init();
 void BT_read();
-void dataProcess(char data);
 
 
 #endif // __BLUETOOTH_H__
