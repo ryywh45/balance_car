@@ -11,6 +11,5 @@ void loop(){
     //Motor_ctrl();
     //MPU9250_updata();
     //MPU9250_test();
-    BT_read();
-    delay(50);
+    parameter_change();
 }
