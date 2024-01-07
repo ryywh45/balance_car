@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "timer.h"
-#include "motor.h"
-#include "mpu9250.h"
+//#include "motor.h"
+//#include "mpu9250.h"
 
 hw_timer_t * timer = NULL;
 volatile SemaphoreHandle_t timerSemaphore;
@@ -38,10 +38,7 @@ void Timer_init() {
   timerAlarm(timer, Period * 1000, true, 0);
 }
 
-void check_timer() {
-  // If Timer has fired （放在main)
-  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
-    // read 9250
-    Motor_ctrl();
-  }
+bool check_timer() {
+  // true = Timer has fired
+  return (xSemaphoreTake(timerSemaphore, 0) == pdTRUE);
 }

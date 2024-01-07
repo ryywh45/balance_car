@@ -1,12 +1,12 @@
-#ifdef __TIMER_H__
+#ifndef __TIMER_H__
 #define __TIMER_H__
 
 
-#define Peroid 50 // milli second
+#define Period 10 // milli second
 
 void ARDUINO_ISR_ATTR onTimer();
 void Timer_init();
-void check_timer();
+bool check_timer();
 
 
 #endif // __TIMER_H__
