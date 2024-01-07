@@ -4,6 +4,9 @@ float Target_Speed = 0;
 float Speed_Difference = 0;
 float Integral_Speed_Diff = 0;
 float Target_Direction = 0;
+float Kp_b = 200,Kd_b = 0.1;
+float Kp_s = 10,Ki_s = 0.08;
+float Kp_d = 15,Kd_d = 0.5;
 
 // Keep the car at a balance angle (pitch)
 int balance(float angle, float angular_velocity){
