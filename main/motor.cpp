@@ -4,12 +4,22 @@
 
 //
 void Motor_init(){
+    pinMode(PWM_L, OUTPUT);
+    pinMode(LIN1, OUTPUT);
+    pinMode(LIN2, OUTPUT);
+    pinMode(PWM_R, OUTPUT);
+    pinMode(RIN1, OUTPUT);
+    pinMode(RIN2, OUTPUT);
+    pinMode(STBY, OUTPUT);
+    digitalWrite(STBY, 1);
     digitalWrite(LIN1, 0);
     digitalWrite(LIN2, 0);
     digitalWrite(RIN1, 0);
     digitalWrite(RIN2, 0);
-    analogWriteResolution(PWM_L, 12); // 0 ~ 4095
-    analogWriteResolution(PWM_R, 12); // 0 ~ 4095
+    // analogWriteResolution(PWM_L, 12); // 0 ~ 4095
+    // analogWriteResolution(PWM_R, 12); // 0 ~ 4095
+    analogWriteResolution(PWM_L, 10); // 0 ~ 1023
+    analogWriteResolution(PWM_R, 10); // 0 ~ 1023
 }
 
 //
@@ -54,5 +64,27 @@ void Apply_PWM(int pwm, int motor_num){
             digitalWrite(RIN2, 1);
         }
     }
+}
 
+void Motor_test(int pwm_max){
+    for (int i=0; i<pwm_max; i+=10){
+        Apply_PWM(i, 1); // left
+        Apply_PWM(i, 2); // right
+        delay(500);
+    }
+    for (int i=pwm_max; i>0; i-=10){
+        Apply_PWM(i, 1); // left
+        Apply_PWM(i, 2); // right
+        delay(500);
+    }
+    for (int i=0; i<pwm_max; i+=10){
+        Apply_PWM(-i, 1); // left
+        Apply_PWM(-i, 2); // right
+        delay(500);
+    }
+    for (int i=pwm_max; i>0; i-=10){
+        Apply_PWM(-i, 1); // left
+        Apply_PWM(-i, 2); // right
+        delay(500);
+    }
 }
