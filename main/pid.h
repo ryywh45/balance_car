@@ -3,7 +3,7 @@
 
 
 int balance(float angle, float angular_velocity);
-#define Balance_angle 0
+#define Balance_angle 0.005
 
 int speed(float angle, float speed);
 

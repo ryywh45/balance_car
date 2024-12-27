@@ -29,10 +29,10 @@ void Motor_ctrl(){
     int pwm_l = pwm + d_pwm;
     int pwm_r = pwm - d_pwm;
 
-    if (pwm_l > 4095) pwm_l = 4095;
-    if (pwm_r > 4095) pwm_r = 4095;
-    if (pwm_l < -4095) pwm_l = -4095;
-    if (pwm_l < -4095) pwm_r = -4095;
+    if (pwm_l > 1023) pwm_l = 1023;
+    if (pwm_r > 1023) pwm_r = 1023;
+    if (pwm_l < -1023) pwm_l = -1023;
+    if (pwm_l < -1023) pwm_r = -1023;
 
     Apply_PWM(pwm_l, 1); // left
     Apply_PWM(pwm_r, 2); // right
@@ -48,8 +48,8 @@ void Apply_PWM(int pwm, int motor_num){
         }
         else{
             analogWrite(PWM_R, pwm);
-            digitalWrite(RIN1, 1);
-            digitalWrite(RIN2, 0);
+            digitalWrite(RIN1, 0); // 兩個馬達線接反的
+            digitalWrite(RIN2, 1);
         }
     }
     else{
@@ -60,8 +60,8 @@ void Apply_PWM(int pwm, int motor_num){
         }
         else{
             analogWrite(PWM_R, -pwm);
-            digitalWrite(RIN1, 0);
-            digitalWrite(RIN2, 1);
+            digitalWrite(RIN1, 1);
+            digitalWrite(RIN2, 0);
         }
     }
 }

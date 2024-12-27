@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "mpu9250.h"
 #include "MPU9250.h"
+#include "math.h"
 #include <Adafruit_AHRS_Madgwick.h>
 
 bfs::Mpu9250 mpu;
@@ -12,10 +13,10 @@ float pitch_angular_v;
 float speed_x;
 float yaw_angular_v;
 float aX, aY, aZ, gX, gY, gZ;
-float accErrorX = 0.19641, accErrorY = 0.42531, accErrorZ = -0.16247;
-float gyroErrorX = -0.04489, gyroErrorY = -0.07271, gyroErrorZ = 0.01201;
+float accErrorX = 0.07076, accErrorY = 0.13259, accErrorZ = -0.15866;
+float gyroErrorX = -0.04275, gyroErrorY = -0.07160, gyroErrorZ = 0.01271;
 float previousTime = 0, currentTime = 0, elaspTime = 0;
-float sampleRate = 17.45;       // sampleRate = 1/((1/1000+中斷時間)(57.2958))
+float sampleRate = 1000 / (10);       // sampleRate = 1/((1/1000+中斷時間)(57.2958))
 
 // initial
 void MPU9250_init() {
@@ -38,6 +39,8 @@ void MPU9250_init() {
     while(1) {}
   }
   //calibrateIMU();
+  filter.begin(sampleRate * 0.0174533f);
+  for (int i=0; i<50; i++) MPU9250_updata();
   filter.begin(sampleRate);
   previousTime = millis();
 }
@@ -46,37 +49,39 @@ void MPU9250_init() {
 void MPU9250_updata() {
   currentTime = millis();
   mpu.Read();
-  elaspTime = (currentTime - previousTime)/1000;
+  elaspTime = (currentTime - previousTime) / 1000;
   previousTime = currentTime;
   aX = (mpu.accel_x_mps2() - accErrorX) / 10;
   aY = (mpu.accel_y_mps2() - accErrorY) / 10;
   aZ = (mpu.accel_z_mps2() - accErrorZ) / 10;
-  gX = mpu.gyro_x_radps() - gyroErrorX;
-  gY = mpu.gyro_y_radps() - gyroErrorY;
-  gZ = mpu.gyro_z_radps() - gyroErrorZ;
+  gX = (mpu.gyro_x_radps() - gyroErrorX);
+  gY = (mpu.gyro_y_radps() - gyroErrorY);
+  gZ = (mpu.gyro_z_radps() - gyroErrorZ);
   filter.updateIMU(gX, gY, gZ, aX, aY, aZ);
-  speed_x = -(aX*elaspTime*10);            //向前是正
-  pitch_angular_v = gY * RtoD;     //向前傾斜角度是正
-  pitch_angle = filter.getPitch();   
-  yaw_angular_v = -gZ * RtoD;      //向右轉是正
+  pitch_angle = filter.getPitchRadians();  
+  speed_x = -((aX * 10 + 10 * sin(pitch_angle)) * elaspTime);            //向前是正
+  pitch_angular_v = gY;     //向前傾斜角度是正 
+  yaw_angular_v = -gZ;      //向右轉是正
 }
 
 // print acc,gyro,pitch
 void MPU9250_test(){
-  Serial.println("ax,ay,az,gx,gy,gz,pitch");
-  Serial.print(mpu.accel_x_mps2());
+  Serial.println("ax,ay,az,gx,gy,gz,pitch,speed_x");
+  Serial.print(aX);
   Serial.print("\t");
-  Serial.print(mpu.accel_y_mps2());
+  Serial.print(aY);
   Serial.print("\t");
-  Serial.print(mpu.accel_z_mps2());
+  Serial.print(aZ);
   Serial.print("\t");
-  Serial.print(mpu.gyro_x_radps()*RtoD);
+  Serial.print(gX);
   Serial.print("\t");
-  Serial.print(mpu.gyro_y_radps()*RtoD);
+  Serial.print(gY);
   Serial.print("\t");
-  Serial.print(mpu.gyro_z_radps()*RtoD);
+  Serial.print(gZ);
   Serial.print("\t");
-  Serial.print(filter.getPitch());
+  Serial.print(pitch_angle);
+  Serial.print("\t");
+  Serial.print(speed_x);
   Serial.println("");
 }
 
@@ -110,7 +115,7 @@ void calibrateIMU() {
 
     accErX = accErX / 300;
     accErY = accErY / 300;
-    accErZ = (accErZ / 300);
+    accErZ = accErZ / 300;
     gyroErX = gyroErX / 300;
     gyroErY = gyroErY / 300;
     gyroErZ = gyroErZ / 300;
