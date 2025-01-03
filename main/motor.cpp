@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "motor.h"
 #include "pid.h"
+#include "MPU.h"
 
 //
 void Motor_init(){
@@ -25,7 +26,8 @@ void Motor_init(){
 //
 void Motor_ctrl(){
     int d_pwm = direction(yaw_angular_v);
-    int pwm = balance(pitch_angle, pitch_angular_v) + speed(pitch_angle, speed_x);
+    int pwm = balance(pitch_angle, pitch_angular_v)/* + speed(pitch_angle, speed_x)*/;
+
     int pwm_l = pwm + d_pwm;
     int pwm_r = pwm - d_pwm;
 
@@ -36,6 +38,8 @@ void Motor_ctrl(){
 
     Apply_PWM(pwm_l, 1); // left
     Apply_PWM(pwm_r, 2); // right
+
+    print_io_data(pwm);
 }
 
 //

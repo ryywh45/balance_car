@@ -49,7 +49,7 @@ void MPU9250_updata() {
     gY = mpu.getGyroY();
     gZ = mpu.getGyroZ();
     pitch_angle = mpu.getRoll(); //實際pitch與roll相反
-    speed_x = -((aX * 10 + 10 * sin(pitch_angle)) * elaspTime);            //向前是正
+    //speed_x = -((aX * 10 + 10 * sin(pitch_angle)) * elaspTime);            //向前是正
     pitch_angular_v = gY;     //向前傾斜角度是正 
     yaw_angular_v = -gZ;      //向右轉是正
   }
@@ -74,6 +74,15 @@ void MPU9250_test(){
   Serial.print(pitch_angular_v ,2);
   Serial.print("\t");
   Serial.print(speed_x,2);
+  Serial.println("");
+}
+
+void print_io_data(int pwm){
+  Serial.print(millis());
+  Serial.print(",");
+  Serial.print(pitch_angle);
+  Serial.print(",");
+  Serial.print(pwm);
   Serial.println("");
 }
 

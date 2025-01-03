@@ -14,7 +14,7 @@ void setup(){
 void loop(){
     if (check_timer()){
         MPU9250_updata();
-        MPU9250_test();
-        // Motor_ctrl();
+        //MPU9250_test();
+        Motor_ctrl();
     }
 }

@@ -17,5 +17,6 @@ byte readByte(int address);
 float readFloat(int address);
 void clearCalibration();
 bool isCalibrated();
+void print_io_data(int pwm);
 
 #endif // __MPU9250_H__
