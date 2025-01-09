@@ -4,6 +4,8 @@
 
 #define RtoD 57.2958 // radians to degree: 180/pi
 
+extern float Ki_b;
+
 void MPU9250_init();
 void MPU9250_updata();
 void MPU9250_test();

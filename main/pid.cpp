@@ -5,9 +5,9 @@ float Speed_Difference = 0;
 float Integral_Speed_Diff = 0;
 float Target_Direction = 0;
 
-float Kp_b = -1273.1; // 2500   1000   600
+float Kp_b = -300; // 2500   1000   600
 float Ki_b = 0.0022;
-float Kd_b = 0.000543;  // 1500   20     12
+float Kd_b = 5;  // 1500   20     12
 
 float Kp_s = 0;  // 260 500
 float Ki_s = 0;  // 13  2.5
@@ -17,7 +17,7 @@ float Kd_d = 0;
 
 // Keep the car at a balance angle (pitch)
 int balance(float angle, float angular_velocity){
-    return Kp_b * (Balance_angle - angle) + Ki_b * () + Kd_b * angular_velocity; // PID
+    return Kp_b * (Balance_angle - angle) + /*Ki_b * (pitch_integral) + */Kd_b * angular_velocity; // PID pitch_integral不確定是否加負數
 }
 
 // Keep the car at target speed

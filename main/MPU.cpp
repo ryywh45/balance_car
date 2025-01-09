@@ -3,23 +3,29 @@
 #include "MPU9250.h"
 #include "math.h"
 #include <EEPROM.h>
+#include "bluetooth.h"
 
 MPU9250 mpu;
+extern BluetoothHelper btHelper;
 
 // unit of acc [m/s2], gyro [deg/s], angle [deg]
 float pitch_angle;
 float pitch_angular_v;
+float pitch_integral;
 float speed_x;
 float yaw_angular_v;
 float aX, aY, aZ, gX, gY, gZ;
 float previousTime = 0, currentTime = 0, elaspTime = 0;
+int first = 1;
+float speed_offset;
 
 enum EEP_ADDR {
     EEP_CALIB_FLAG = 0x00,
     EEP_ACC_BIAS = 0x01,
     EEP_GYRO_BIAS = 0x0D,
     EEP_MAG_BIAS = 0x19,
-    EEP_MAG_SCALE = 0x25
+    EEP_MAG_SCALE = 0x25,
+    EEP_DATA_FLAG = 0x31
 };
 
 // initial
@@ -40,17 +46,30 @@ void MPU9250_init() {
 void MPU9250_updata() {
   if (mpu.update()) {
     currentTime = millis();
-    elaspTime = (currentTime - previousTime) / 1000;
+    if(first == 1){
+      previousTime = currentTime;
+      first = 0;
+    }
+    elaspTime = (currentTime - previousTime) / 1000; //dt
     previousTime = currentTime;
+
     aX = mpu.getAccX();
     aY = mpu.getAccY();
     aZ = mpu.getAccZ();
     gX = mpu.getGyroX();
     gY = mpu.getGyroY();
     gZ = mpu.getGyroZ();
+
     pitch_angle = mpu.getRoll(); //實際pitch與roll相反
-    //speed_x = -((aX * 10 + 10 * sin(pitch_angle)) * elaspTime);            //向前是正
-    pitch_angular_v = gY;     //向前傾斜角度是正 
+
+    // add pitch_integral count
+    pitch_integral += pitch_angle * elaspTime;
+    // if(pitch_integral >= (20 / Ki_b)) pitch_integral = (20 / Ki_b);
+    // else if (pitch_integral <= -(20 / Ki_b)) pitch_integral = -(20 / Ki_b);
+
+    speed_offset = (pitch_angle > 0) ? 1 : -1;
+    speed_x += -((aY* 10 - 10*sin(((pitch_angle + speed_offset) / RtoD))) * elaspTime);            //向前是正
+    pitch_angular_v = gX;     //向前傾斜角度是正 
     yaw_angular_v = -gZ;      //向右轉是正
   }
 }
@@ -83,7 +102,14 @@ void print_io_data(int pwm){
   Serial.print(pitch_angle);
   Serial.print(",");
   Serial.print(pwm);
+  Serial.print(",");
+  Serial.print(aY* 10);
+  Serial.print(",");
+  Serial.print(sin(((pitch_angle + speed_offset) / RtoD)) * 10);
+  Serial.print(",");
+  Serial.print(speed_x);
   Serial.println("");
+  btHelper.BT_send(millis(), pitch_angle, pwm, pitch_angular_v);
 }
 
 // update Bias(XXXError)
@@ -155,14 +181,14 @@ void saveCalibration() {
     writeFloat(EEP_MAG_SCALE + 0, mpu.getMagScale(0));
     writeFloat(EEP_MAG_SCALE + 4, mpu.getMagScale(1));
     writeFloat(EEP_MAG_SCALE + 8, mpu.getMagScale(2));
-#if defined(ESP_PLATFORM) || defined(ESP8266)
+// #if defined(ESP_PLATFORM) || defined(ESP8266)
     EEPROM.commit();
-#endif
+// #endif
 }
 
 void loadCalibration() {
     Serial.println("Load calibrated parameters from EEPROM");
-    if (isCalibrated()) {
+    if (isCalibrated()) {//isCalibrated()
         Serial.println("calibrated? : YES");
         Serial.println("load calibrated values");
         mpu.setAccBias(
@@ -184,8 +210,8 @@ void loadCalibration() {
     } else {
         Serial.println("calibrated? : NO");
         Serial.println("load default values");
-        mpu.setAccBias(0., 0., 0.);
-        mpu.setGyroBias(0., 0., 0.);
+        mpu.setAccBias(0., 120, 0.);
+        mpu.setGyroBias(-554.0, -268.0, -70.0);
         mpu.setMagBias(0., 0., 0.);
         mpu.setMagScale(1., 1., 1.);
     }

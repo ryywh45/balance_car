@@ -1,11 +1,19 @@
-#ifndef __BLUETOOTH_H__
-#define __BLUETOOTH_H__
+#ifndef BLUETOOTH_H
+#define BLUETOOTH_H
 
-extern float Target_Speed;
-extern float Target_Direction;
+#include <Arduino.h>
+#include "BluetoothSerial.h"
 
-void BT_init();
-void BT_read();
+class BluetoothHelper {
+public:
+  BluetoothHelper(const char* deviceName);
+  void BT_init();
+  void BT_send(unsigned long timestamp, float angle, int pwm_value, float pitch_angular_v);
+  void BT_read();
+private:
+  String _deviceName;
+  BluetoothSerial _serialBT;
+  bool _sendData = false;
+};
 
-
-#endif // __BLUETOOTH_H__
+#endif

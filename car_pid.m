@@ -11,25 +11,31 @@ pwm = data(:, 3);
 % 輸出資料 (角度)
 output_data = angle;
 
-% 輸入資料 (PWM)
-input_data = pwm;
+% 輸入資料 (0.1度)
+input_data = 0.1 * ones(size(time));
+%input_data = pwm;
 
 % 取樣時間 (假設取樣頻率固定，每10毫秒一筆資料，則取樣時間為 0.01 秒)
-Ts = 0.01; % 秒
+sample_time = 0.01; % 秒
 
 % 建立 iddata 對象
-data_id = iddata(output_data, input_data, Ts);
-sys = tfest(data_id, 3, 1);
-% compare(sys, data_id)
+data_id = iddata(output_data, input_data, sample_time);
 
-C0 = pidstd(600, 0.0000000000000000000000000000000000000000000000001, 12);
-[C, info] = pidtune(sys, C0);
-%disp(C);
-%disp(info);
+%Ts transfer function
+Ts = tfest(input_data, output_data, 3, 'Ts', sample_time);
 
-sys_closed = feedback(C*sys, 1);
-step(sys_closed);
+%compare 重和度
+compare(Ts, data_id)
 
-% 若需要儲存為 MAT 檔案
-% save('iddata.mat', 'data_id');
+%PID origin
+CO = pid(600, 0, 12, 'Ts', sample_time);
 
+%反推物理系統
+Tp = Ts / (CO * (1 - Ts));
+
+%用practical 估算真的pid
+[C, info] = pidtune(Ts, CO);
+T_closed_loop = feedback(C * Ts, 1);
+
+figure
+step(T_closed_loop); % 模擬步階響應
